@@ -16,7 +16,7 @@ class _NotesScreenState extends State<NotesScreen> {
   final titleCtrl = TextEditingController();
   final contentCtrl = TextEditingController();
   late Realm realm;
-  late final notes;
+  late List<Note> notes;
 
   void initRealm() {
     var config = Configuration.local([Note.schema]);
@@ -44,6 +44,38 @@ class _NotesScreenState extends State<NotesScreen> {
                 .contains(searchCtrl.text.toLowerCase()))
         .toList();
     setState(() {});
+  }
+
+  void addNote() {
+    if (titleCtrl.text.isNotEmpty && contentCtrl.text.isNotEmpty) {
+      Note note = Note(titleCtrl.text, contentCtrl.text, date: DateTime.now());
+      realm.write(
+        () => realm.add(note),
+      );
+      loadNotes();
+      Navigator.of(context).pop();
+    }
+  }
+
+  void updateNote(int index) {
+    if (titleCtrl.text.isNotEmpty && contentCtrl.text.isNotEmpty) {
+      realm.write(() {
+        notes[index].title = titleCtrl.text;
+        notes[index].content = contentCtrl.text;
+        notes[index].date = DateTime.now();
+      });
+      loadNotes();
+      Navigator.of(context).pop();
+    }
+  }
+
+  void deleteNote(Note note) {
+    realm.write(() => realm.delete(note));
+  }
+
+  void clearCtrls() {
+    titleCtrl.clear();
+    contentCtrl.clear();
   }
 
   @override
@@ -109,7 +141,7 @@ class _NotesScreenState extends State<NotesScreen> {
                           title: Text(note.title),
                           subtitle: Text(note.content),
                           trailing: Text(
-                              '${DateFormat.yMMMMd().format(note.date)} - ${DateFormat.jm().format(note.date)}'),
+                              '${DateFormat.yMMMMd().format(note.date!)} - ${DateFormat.jm().format(note.date!)}'),
                         ),
                       ),
                     );
@@ -181,37 +213,5 @@ class _NotesScreenState extends State<NotesScreen> {
         );
       },
     );
-  }
-
-  void addNote() {
-    if (titleCtrl.text.isNotEmpty && contentCtrl.text.isNotEmpty) {
-      Note note = Note(titleCtrl.text, contentCtrl.text, date: DateTime.now());
-      realm.write(
-        () => realm.add(note),
-      );
-      loadNotes();
-      Navigator.of(context).pop();
-    }
-  }
-
-  void updateNote(int index) {
-    if (titleCtrl.text.isNotEmpty && contentCtrl.text.isNotEmpty) {
-      realm.write(() {
-        notes[index].title = titleCtrl.text;
-        notes[index].content = contentCtrl.text;
-        notes[index].date = DateTime.now();
-      });
-      loadNotes();
-      Navigator.of(context).pop();
-    }
-  }
-
-  void deleteNote(Note note) {
-    realm.write(() => realm.delete(note));
-  }
-
-  void clearCtrls() {
-    titleCtrl.clear();
-    contentCtrl.clear();
   }
 }
