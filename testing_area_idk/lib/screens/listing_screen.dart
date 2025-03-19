@@ -42,7 +42,9 @@ class ListingScreen extends StatelessWidget {
   Future<void> fetchCities(String? id, BuildContext context) async {
     cityCtrl.clear();
     if (id != null) {
-      Uri url = Uri.parse('https://psgc.gitlab.io/api/provinces/$id/cities/');
+      Uri url = Uri.parse(
+        'https://psgc.gitlab.io/api/provinces/$id/cities-municipalities/',
+      );
       Response response = await get(url);
       if (response.statusCode == 200) {
         List result = jsonDecode(response.body);
@@ -119,7 +121,7 @@ class ListingScreen extends StatelessWidget {
                   controller: regionCtrl,
                   hintText: 'Select Region',
                   width: MediaQuery.of(context).size.width,
-                  menuHeight: 200,
+                  menuHeight: MediaQuery.of(context).size.height / 1.4,
                   onSelected: (value) => fetchProvinces(value, context),
                   dropdownMenuEntries:
                       regions
@@ -144,6 +146,7 @@ class ListingScreen extends StatelessWidget {
                       controller: provinceCtrl,
                       hintText: 'Select Province',
                       width: MediaQuery.of(context).size.width,
+                      menuHeight: MediaQuery.of(context).size.height / 1.6,
                       onSelected: (value) => fetchCities(value, context),
                       dropdownMenuEntries:
                           provinces
@@ -160,6 +163,7 @@ class ListingScreen extends StatelessWidget {
                       controller: cityCtrl,
                       hintText: 'Select City',
                       width: MediaQuery.of(context).size.width,
+                      menuHeight: MediaQuery.of(context).size.height / 1.8,
                       dropdownMenuEntries:
                           cities
                               .map(
